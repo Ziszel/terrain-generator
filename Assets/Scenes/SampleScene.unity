@@ -382,10 +382,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d59dd757abf51d48ad24ddc50568b15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xSize: 10
-  zSize: 10
-  maxHeight: 1
-  minHeight: 0
+  xSize: 120
+  zSize: 120
+  perlinScale: 20
+  modifer: 0.059
 --- !u!4 &1026868480
 Transform:
   m_ObjectHideFlags: 0

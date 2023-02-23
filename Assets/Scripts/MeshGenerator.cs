@@ -12,14 +12,17 @@ public class MeshGenerator : MonoBehaviour
 {
     [SerializeField] private int xSize;
     [SerializeField] private int zSize;
-    [SerializeField] private float maxHeight;
-    [SerializeField] private float minHeight;
+    [SerializeField] private float perlinScale;
+    [SerializeField] private float modifer;
     private Mesh _mesh;
     private Vector3[] _vertices;
     private int[] _triangles;
 
     void Start()
     {
+        //https://docs.unity3d.com/ScriptReference/Random-value.html
+        // value returns a value between 0.0 and 1.0 inclusive, thus better for me than Random.Range();
+        //_Modifer = Random.value;
         GetComponent<MeshFilter>().mesh = _mesh = new Mesh();   
         GenerateQuadGrid();
     }
@@ -39,7 +42,6 @@ public class MeshGenerator : MonoBehaviour
         // the number of triangles of a grid is ALWAYS:
         // the (number of vertices - 1) squared * 2 (each quad is two triangles) * 3 (each triangle is 3 vertices)
         _triangles = new int[(xSize - 1) * (zSize - 1) * 6]; // * 2 * 3 is equal to * 6
-        Debug.Log(_triangles.Length);
         int triangleIndex = 0;
         // loop over the array of vertices, setting the position of each vertex AND the triangles relating to it
         // https://catlikecoding.com/unity/tutorials/procedural-grid/
@@ -48,8 +50,7 @@ public class MeshGenerator : MonoBehaviour
             for (int x = 0; x < xSize; ++x)
             {
                 // Assign the vertex a position at the index of the array i
-                // The y value is set randomly to generate terrain
-                _vertices[i] = new Vector3(x, ManipulateVertexHeight(i), z);
+                _vertices[i] = new Vector3(x, ManipulateVertexHeight(x, z), z);
 
                 // to calculate triangles in a grid, clockwise
                 // i, i+xSize. i+1, i+1, i+xSize, i+size+1
@@ -80,9 +81,12 @@ public class MeshGenerator : MonoBehaviour
         _mesh.RecalculateNormals();
     }
 
-    private float ManipulateVertexHeight(int i)
+    private float ManipulateVertexHeight(float x, float z)
     {
-        float yValue;
+        // This was used to test out a random point between a min and max value.
+        // Whilst interesting, the results were very rough as expected. I have opted to layer perlin noise instead
+        // which can be seen below this code
+        /*float yValue;
         if (i == 0)
         {
             // Get a random Y as the initial seed
@@ -99,9 +103,13 @@ public class MeshGenerator : MonoBehaviour
         else
         {
             yValue = Random.Range(_vertices[i - 1].y, maxHeight + 1);
-        }
-        
-        return yValue;
+        }*/
+
+        // The y value is set using perlin noise to generate terrain variance
+        // https://docs.unity3d.com/ScriptReference/Mathf.PerlinNoise.html
+        // https://forum.unity.com/threads/mathf-perlinnoise-method.197562/
+        return Mathf.PerlinNoise(x * modifer, z * modifer) * perlinScale;
+        //return returnValue;
 
     }
     
