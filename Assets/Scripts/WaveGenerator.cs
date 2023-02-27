@@ -59,6 +59,7 @@ public class WaveGenerator : MonoBehaviour
 
         _mesh.vertices = vertices;
         _mesh.RecalculateNormals();
+        _mesh.RecalculateBounds();
     }
 
     private Vector3 GerstnerWave(Vector3 vertex, float waveLength)
@@ -136,6 +137,7 @@ public class WaveGenerator : MonoBehaviour
         _mesh.vertices = _vertices;
         _mesh.triangles = _triangles;
         _mesh.RecalculateNormals();
+        _mesh.RecalculateBounds();
     }
 
     private float ManipulateVertexHeight(float x, float z)
