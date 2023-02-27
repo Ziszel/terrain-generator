@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -12,8 +13,12 @@ public class MeshGenerator : MonoBehaviour
 {
     [SerializeField] private int xSize;
     [SerializeField] private int zSize;
-    [SerializeField] private float perlinScale;
+    [SerializeField] private float perlinScaleGen;
+    [SerializeField] private float perlinScaleUpdate;
     [SerializeField] private float modifer;
+    [SerializeField] private float framePerlin;
+    [SerializeField] private float sineScale;
+    [SerializeField] private float sineSpeed;
     private Mesh _mesh;
     private Vector3[] _vertices;
     private int[] _triangles;
@@ -25,6 +30,21 @@ public class MeshGenerator : MonoBehaviour
         //_Modifer = Random.value;
         GetComponent<MeshFilter>().mesh = _mesh = new Mesh();   
         GenerateQuadGrid();
+    }
+
+    private void Update()
+    {
+        Vector3[] vertices = new Vector3[_vertices.Length];
+        for (int i = 0; i < _vertices.Length; ++i)
+        {
+            Vector3 vertex = _vertices[i];
+            vertex.y += Mathf.Sin(Time.time * sineSpeed + _vertices[i].x + _vertices[i].y + _vertices[i].z) * sineScale;
+            vertex.y += Mathf.PerlinNoise(_vertices[i].x + framePerlin, _vertices[i].y + Mathf.Sin(Time.time * 0.1f)) * perlinScaleUpdate;
+            vertices[i] = vertex;
+        }
+
+        _mesh.vertices = vertices;
+        _mesh.RecalculateNormals();
     }
 
     private void GenerateQuadGrid()
@@ -108,7 +128,7 @@ public class MeshGenerator : MonoBehaviour
         // The y value is set using perlin noise to generate terrain variance
         // https://docs.unity3d.com/ScriptReference/Mathf.PerlinNoise.html
         // https://forum.unity.com/threads/mathf-perlinnoise-method.197562/
-        return Mathf.PerlinNoise(x * modifer, z * modifer) * perlinScale;
+        return Mathf.PerlinNoise(x * modifer, z * modifer) * perlinScaleGen;
         //return returnValue;
 
     }
