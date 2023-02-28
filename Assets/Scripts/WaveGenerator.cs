@@ -17,13 +17,20 @@ public class WaveGenerator : MonoBehaviour
     [SerializeField] private int zSize;
     [SerializeField] private float perlinScaleGen;
     [SerializeField] private float modifer;
-    [Header("Gerstner Wave Parameters")]
+    // These values were used for testing purposes as they will be controlled inside of the app
+    // I have left them commented in-case I need to do more testing inside of the inspector
+    /*[Header("Gerstner Wave Parameters")]
     [SerializeField] private float wavelength = 10f;
     [SerializeField] private float wavelengthSecWave = 20f;
-    [SerializeField] [Range(0, 1)] float amplitude = 0.5f;
+    [SerializeField] [Range(0, 1)] float amplitude = 0.5f;*/
     private Mesh _mesh;
     private Vector3[] _vertices;
     private int[] _triangles;
+
+    private float _wavelength = 10.0f;
+    private float _wavelengthSecWave = 20.0f;
+    private float _amplitude = 0.5f;
+    
 
     void Start()
     {
@@ -46,8 +53,8 @@ public class WaveGenerator : MonoBehaviour
             Vector3 vertex = _vertices[i];
 
             Vector3 p = new Vector3(vertex.x, vertex.y, vertex.z);
-            p += GerstnerWave(vertex, wavelength);
-            p += GerstnerWave(vertex, wavelengthSecWave);
+            p += GerstnerWave(vertex, _wavelength);
+            p += GerstnerWave(vertex, _wavelengthSecWave);
 
             vertices[i] = p; // Update the vertex at i position following transformations
 
@@ -60,6 +67,21 @@ public class WaveGenerator : MonoBehaviour
         _mesh.vertices = vertices;
         _mesh.RecalculateNormals();
         _mesh.RecalculateBounds();
+    }
+
+    public void SetAmplitude(float value)
+    {
+        _amplitude = value;
+    }
+
+    public void SetWavelength(float value)
+    {
+        _wavelength = value;
+    }
+
+    public void SetSecWaveLength(float value)
+    {
+        _wavelengthSecWave = value;
     }
 
     private Vector3 GerstnerWave(Vector3 vertex, float waveLength)
@@ -78,10 +100,10 @@ public class WaveGenerator : MonoBehaviour
         // - c (phase speed) * Time.time
         float f = k * (Vector2.Dot(direction, new Vector2(vertex.x, vertex.z)) - c * Time.time);
         // For x and z add the direction of x and z * the amplitude of the wave * cos(f)
-        vertex.x += direction.x * (amplitude * Mathf.Cos(f));
+        vertex.x += direction.x * (_amplitude * Mathf.Cos(f));
         // For y, I'm only interested in the amplitude * sin(f)
-        vertex.y += amplitude * (float)Math.Sin(f);
-        vertex.z += direction.y * (amplitude * Mathf.Cos(f));
+        vertex.y += _amplitude * (float)Math.Sin(f);
+        vertex.z += direction.y * (_amplitude * Mathf.Cos(f));
         return new Vector3(vertex.x, vertex.y, vertex.z);
     }
 
